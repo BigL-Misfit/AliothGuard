@@ -3,7 +3,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 mkdir -p reports
-shellcheck --external-sources --shell=sh action.sh customize.sh scripts/*.sh build.sh |& tee reports/shellcheck.txt
+shellcheck --external-sources --shell=sh action.sh customize.sh scripts/*.sh build.sh tests/*.sh |& tee reports/shellcheck.txt
 shellcheck --external-sources tools/check.sh tools/emulator-smoke.sh |& tee -a reports/shellcheck.txt
 printf '%s\n' 'PASS: ShellCheck' | tee -a reports/shellcheck.txt
 actionlint -color |& tee reports/actionlint.txt

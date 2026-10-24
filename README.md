@@ -85,6 +85,10 @@ compiled code and credentials are excluded.
 The optional Android 15 **x86_64** emulator job runs only when selected in a
 manual run. It checks Android shell execution without Magisk. It does not test
 ARM64 injection, Mi 11X hardware/kernel, OrangeFox, boot safety or attestation.
+The same sanitizer regression fixture runs on host utilities, BusyBox and
+Android Toybox: all 256 byte values, Android property strings and the 160-character
+limit. The emulator also compares reported SDK, release and patch values with
+direct `getprop` output; reports and failed commands are included in the job log.
 It can fail on image availability independently of the required build. Skipped
 or unrun checks are not passes.
 
