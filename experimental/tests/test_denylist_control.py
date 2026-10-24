@@ -22,7 +22,7 @@ class Controls(unittest.TestCase):
         (p/"magisk").write_text(MOCK); (p/"magisk").chmod(0o755)
         (p/"pm").write_text('#!/bin/sh\n[ "$1" = path ] && [ "$2" = com.example.app ]\n')
         (p/"pm").chmod(0o755)
-        (p/"id").write_text('#!/bin/sh\nif [ "$1" = -u ]; then printf "%s\\n" "\${AG_TEST_UID:-0}"; else /usr/bin/id "$@"; fi\n')
+        (p/"id").write_text('#!/bin/sh\nif [ "$1" = -u ]; then printf "%s\\n" "${AG_TEST_UID:-0}"; else /usr/bin/id "$@"; fi\n')
         (p/"id").chmod(0o755)
         self.log=p/"log"
         self.env={**os.environ,"PATH":str(p)+":"+os.environ["PATH"],"AG_TEST_LOG":str(self.log)}
