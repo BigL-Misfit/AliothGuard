@@ -32,7 +32,10 @@ jobs:
           GOBIN="$RUNNER_TEMP/bin" go install github.com/rhysd/actionlint/cmd/actionlint@v1.7.7
           echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
           echo "JAVA_HOME=$JAVA_HOME_17_X64" >> "$GITHUB_ENV"
-          sdkmanager 'ndk;27.2.12479018' 'platforms;android-35' 'build-tools;35.0.0'
+          # The hosted Ubuntu image installs sdkmanager but does not put it on PATH.
+          SDKMANAGER="${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager"
+          test -x "$SDKMANAGER" || { echo "::error::Android sdkmanager missing at $SDKMANAGER"; exit 1; }
+          "$SDKMANAGER" --sdk_root="$ANDROID_HOME" 'ndk;27.2.12479018' 'platforms;android-35' 'build-tools;35.0.0'
       - name: Test, compile both ABIs, build and validate separate artifacts
         run: bash experimental/tools/check.sh
       - name: Upload experimental module and lab APK
