@@ -1,0 +1,6 @@
+id=aliothguard_experimental
+name=AliothGuard Experimental (lab only)
+version=v0.2.0
+versionCode=200
+author=BigL-Misfit
+description=Disabled-by-default Zygisk test-app probe and compatibility controller. No root hiding or integrity spoofing. Separate from stable AliothGuard.

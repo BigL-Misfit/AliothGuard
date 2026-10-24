@@ -1,0 +1,102 @@
+name: Experimental native laboratory
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      emulator:
+        description: Run unrooted Android 15 x86_64 lab smoke (no Zygisk/device validation)
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: aliothguard-experimental-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Install free pinned build and validation tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends shellcheck busybox-static
+          GOBIN="$RUNNER_TEMP/bin" go install github.com/rhysd/actionlint/cmd/actionlint@v1.7.7
+          echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
+          echo "JAVA_HOME=$JAVA_HOME_17_X64" >> "$GITHUB_ENV"
+          sdkmanager 'ndk;27.2.12479018' 'platforms;android-35' 'build-tools;35.0.0'
+      - name: Test, compile both ABIs, build and validate separate artifacts
+        run: bash experimental/tools/check.sh
+      - name: Upload experimental module and lab APK
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: AliothGuard-Experimental-v0.2.0
+          path: |
+            dist/experimental/AliothGuard-Experimental-v0.2.0.zip
+            dist/experimental/AliothGuard-Lab-v0.2.0.apk
+            dist/experimental/SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 14
+      - name: Upload emulator native test executable
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: AliothGuard-Experimental-emulator-inputs
+          path: dist/experimental/libs/x86_64/ag_policy_test
+          if-no-files-found: error
+          retention-days: 7
+      - name: Upload validation reports
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: AliothGuard-Experimental-reports
+          path: reports/experimental/
+          if-no-files-found: warn
+          retention-days: 14
+
+  android-experimental-smoke:
+    if: github.event_name == 'workflow_dispatch' && inputs.emulator
+    needs: native-build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: AliothGuard-Experimental-v0.2.0
+          path: dist/experimental
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: AliothGuard-Experimental-emulator-inputs
+          path: dist/experimental/emulator-inputs
+      - name: Permit hosted-runner KVM access
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Android 15 native and app smoke
+        uses: reactivecircus/android-emulator-runner@324029e2f414c084d8b15ba075288885e74aef9c # v2.34.0
+        with:
+          api-level: 35
+          target: default
+          arch: x86_64
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          script: bash experimental/tools/emulator-smoke.sh
+      - name: Upload emulator reports
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: AliothGuard-Experimental-emulator
+          path: reports/experimental-emulator/
+          if-no-files-found: warn
+          retention-days: 7
