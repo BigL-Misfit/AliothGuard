@@ -22,6 +22,8 @@ class Controls(unittest.TestCase):
         (p/"magisk").write_text(MOCK); (p/"magisk").chmod(0o755)
         (p/"pm").write_text('#!/bin/sh\n[ "$1" = path ] && [ "$2" = com.example.app ]\n')
         (p/"pm").chmod(0o755)
+        (p/"id").write_text('#!/bin/sh\\nif [ "$1" = -u ]; then printf "%s\\n" "${AG_TEST_UID:-0}"; else /usr/bin/id "$@"; fi\\n'.replace('\\\\n','\\n'))
+        (p/"id").chmod(0o755)
         self.log=p/"log"
         self.env={**os.environ,"PATH":str(p)+":"+os.environ["PATH"],"AG_TEST_LOG":str(self.log)}
     def call(self,*args):
@@ -51,7 +53,6 @@ class Controls(unittest.TestCase):
         r=self.call("add","bad;command")
         self.assertNotEqual(r.returncode,0)
         self.assertFalse(self.log.exists())
-    @unittest.skipUnless(os.getuid()==0,"requires isolated root test runner")
     def test_explicit_add_and_remove(self):
         a=self.call("add","com.example.app")
         self.assertEqual(a.returncode,0,a.stderr)
@@ -60,4 +61,10 @@ class Controls(unittest.TestCase):
         self.assertEqual(self.log.read_text().splitlines(),[
             "--denylist add com.example.app com.example.app",
             "--denylist rm com.example.app com.example.app"])
+    def test_nonroot_refused(self):
+        self.env["AG_TEST_UID"]="2000"
+        result=self.call("add","com.example.app")
+        self.assertNotEqual(result.returncode,0)
+        self.assertIn("Root required",result.stderr)
+        self.assertFalse(self.log.exists())
 if __name__=="__main__": unittest.main()
