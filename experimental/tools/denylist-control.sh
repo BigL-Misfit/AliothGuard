@@ -24,7 +24,7 @@ case "${1}" in
     magisk --denylist ls
     ;;
   add|remove)
-    [ "$#" -ge 2 ] && [ "$#" -le 3 ] || { usage; exit 2; }
+    if [ "$#" -lt 2 ] || [ "$#" -gt 3 ]; then usage; exit 2; fi
     [ "$(id -u)" = 0 ] || fail 'Root required to change DenyList.'
     valid_name "$2" || fail 'Invalid package identifier.'
     pkg="$2"
