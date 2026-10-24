@@ -5,8 +5,9 @@
 # shellcheck disable=SC2034
 
 ag_clean() {
-  # Bound displayed data and strip control/terminal escape characters.
-  LC_ALL=C tr -cd '\040-\176' | cut -c 1-160
+  # Literal ASCII endpoints work with Toybox and BusyBox (unlike escaped
+  # ranges or optional character classes). Strip controls before limiting.
+  LC_ALL=C tr -cd ' -~' | cut -c 1-160
 }
 
 ag_prop() {

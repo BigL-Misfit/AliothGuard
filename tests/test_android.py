@@ -157,6 +157,8 @@ class AndroidCases:
 
     def test_baseline_report_is_read_only_and_honest(self):
         output = self.diagnostic()
+        for key, value in self.properties.items():
+            self.assertIn(f'{key}: {value}\n', output)
         self.assertIn('matches reported Mi 11X-family', output)
         self.assertIn('Play Integrity verdict: UNKNOWN', output)
         self.assertIn('ROM-integrated spoofing: UNKNOWN', output)
