@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<title>AliothGuard Experimental</title>
+<link rel="stylesheet" href="style.css">
+<main>
+  <p class="badge">EXPERIMENTAL · v0.2.0 · LAB ONLY</p>
+  <h1>AliothGuard</h1>
+  <p>A temporary probe for the dedicated AliothGuard test app. Root hiding and attestation changes are not implemented.</p>
+  <section><h2>Compatibility</h2><p id="provider">Connect through a trusted Magisk-compatible WebUI host.</p><p id="conflicts"></p><p id="rom"></p><p id="session"></p><button id="refresh">Refresh status</button></section>
+  <section><h2>Independent results</h2><p id="root-result">Root detection: no result received.</p><p id="integrity-result">Play Integrity: not requested. No BASIC, DEVICE or STRONG verdict.</p></section>
+  <section><h2>Test configuration</h2>
+    <label>Already configured provider <select id="provider-choice"><option value="builtin">Magisk built-in Zygisk</option><option value="next">Separately installed Zygisk Next</option></select></label>
+    <p>This does not switch providers or enable the module. Conflicts and uncertain provider state block arming.</p>
+    <label><input type="checkbox" id="lab-confirm"> I am using a dedicated recoverable test device, not my only phone.</label>
+    <button id="arm" disabled>Arm test-app probe for five minutes</button>
+  </section>
+  <section><h2>Rollback</h2><p>Clear the test session and mark only this experimental module disabled for the next boot. Existing test-process markers disappear when that process exits.</p><button id="rollback" disabled>Disable this experiment</button></section>
+  <p id="message" role="status">No system changes have been requested.</p>
+  <p class="note">Magisk has no built-in WebUI. A compatible host must expose the KernelSU-style exec bridge. No host, provider or proprietary binary is bundled.</p>
+</main>
+<script type="module" src="app.mjs"></script>
+</html>

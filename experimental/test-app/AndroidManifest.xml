@@ -1,0 +1,9 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="io.github.biglmisfit.aliothguard.test" android:versionCode="200" android:versionName="0.2.0">
+  <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="35" />
+  <application android:label="AliothGuard Lab" android:debuggable="true" android:allowBackup="false" android:extractNativeLibs="true" android:theme="@android:style/Theme.Material.Light.NoActionBar">
+    <activity android:name=".MainActivity" android:exported="true">
+      <intent-filter><action android:name="android.intent.action.MAIN" /><category android:name="android.intent.category.LAUNCHER" /></intent-filter>
+    </activity>
+  </application>
+  <instrumentation android:name=".SmokeTest" android:targetPackage="io.github.biglmisfit.aliothguard.test" android:label="AliothGuard isolated smoke" />
+</manifest>
