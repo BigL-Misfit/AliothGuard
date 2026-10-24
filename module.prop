@@ -1,0 +1,6 @@
+id=aliothguard
+name=AliothGuard
+version=v0.1.0
+versionCode=100
+author=BigL-Misfit
+description=Manual, read-only Magisk compatibility diagnostics for Mi 11X on Android 15. No hiding, spoofing, boot scripts, or integrity guarantees.
