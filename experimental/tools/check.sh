@@ -5,6 +5,7 @@ cd "$(dirname "$0")/../.."
 mkdir -p reports/experimental dist/experimental
 shellcheck --external-sources --shell=sh experimental/module/*.sh experimental/module/scripts/*.sh |& tee reports/experimental/shellcheck.txt
 shellcheck experimental/tools/*.sh |& tee -a reports/experimental/shellcheck.txt
+python3 -m unittest experimental.tests.test_denylist_control -v |& tee reports/experimental/denylist-tests.txt
 actionlint |& tee reports/experimental/actionlint.txt
 python3 -m unittest discover -s experimental/tests -p 'test_*.py' -v |& tee reports/experimental/tests.txt
 node experimental/tests/webui_test.mjs |& tee reports/experimental/webui.txt
